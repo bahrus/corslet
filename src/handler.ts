@@ -26,10 +26,10 @@ export async function handleRequest(request: Request): Promise<Response> {
       <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     </head>
     <body>
-      <h1>WC Info Usage</h1>
+      <h1>Corslet Usage</h1>
       <form style="display:flex;flex-direction:column">
         <label for="href">href</label>
-        <input type="text" id="href" size=100 name="hrefs" value="https://www.flipkart.com/">
+        <input type="text" name="href" value="https://www.flipkart.com/">
         <label for="lhs">lhs</label>
         <input type="text" name="lhs" value="<html">
         <label for="rhs">rhs</label>
@@ -40,12 +40,30 @@ export async function handleRequest(request: Request): Promise<Response> {
         <input type="text" name="lhsWrapper" value="">
         <label for="rhsWrapper">rhsWrapper</label>
         <input type="text" name="rhsWrapper" value="">
+        <label for="ua">User-Agent</label>
+        <input type="text" name="ua" value="">
         <button type="submit">Submit</button>
       </form>
     </body>
   </html>
   `, {headers});
   }
-  
-  return new Response(`request method: ${request.method}`)
+  const ua = unescape(substrBetween(url, 'ua=', '&')) || request.headers.get('user-agent') || "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1 Edg/96.0.4664.55";
+  const response = await fetch(href, {
+    headers: {
+      "User-Agent": ua,
+    }
+  });
+  const ts = unescape(substrBetween(url, 'ts=', '&')) || new Date().toISOString();
+  //TODO:  check for cache
+  const text = await response.text();
+  const lhs = unescape(substrBetween(url, 'lhs=', '&')) || '<html';
+  const rhs = unescape(substrBetween(url, 'rhs=', '&')) || '</html>';
+  const lhsWrapper = unescape(substrBetween(url, 'lhsWrapper=', '&')) || '';
+  const rhsWrapper = unescape(substrBetween(url, 'rhsWrapper=', '&')) || '';
+  const tween = substrBetween(text, lhs, rhs);
+  return new Response(`
+  <!DOCTYPE html>
+  ${lhsWrapper}${lhs}${tween}${rhs}${rhsWrapper}
+  `, {headers});
 }
