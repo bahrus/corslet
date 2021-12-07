@@ -29,17 +29,15 @@ export async function handleRequest(request: Request): Promise<Response> {
       <h1>Corslet Usage</h1>
       <form style="display:flex;flex-direction:column">
         <label for="href">href</label>
-        <input type="text" name="href" value="https://www.flipkart.com/">
+        <input type="text" name="href" value="https://onsen.io/">
         <label for="lhs">lhs</label>
-        <input type="text" name="lhs" value="<html">
+        <input type="text" name="lhs" value="<head">
         <label for="rhs">rhs</label>
-        <input type="text" name="rhs" value="</html>">
+        <input type="text" name="rhs" value="</head>">
         <label for="ts">Timestamp</label>
         <input type="text" id="ts" name="ts" value="${new Date().toISOString()}">
-        <label for="lhsWrapper">lhsWrapper</label>
-        <input type="text" name="lhsWrapper" value="">
-        <label for="rhsWrapper">rhsWrapper</label>
-        <input type="text" name="rhsWrapper" value="">
+        <label for="wrapper">wrapper</label>
+        <textarea type="text" name="wrapper"><template><header href="[href]">|</header></template></textarea>
         <label for="ua">User-Agent</label>
         <input type="text" name="ua" value="">
         <button type="submit">Submit</button>
@@ -60,11 +58,11 @@ export async function handleRequest(request: Request): Promise<Response> {
   const text = await response.text();
   const lhs = unescape(substrBetween(url, 'lhs=', '&')) || '<html';
   const rhs = unescape(substrBetween(url, 'rhs=', '&')) || '</html>';
-  const lhsWrapper = unescape(substrBetween(url, 'lhsWrapper=', '&')) || '';
-  const rhsWrapper = unescape(substrBetween(url, 'rhsWrapper=', '&')) || '';
+  const wrapper = (unescape(substrBetween(url, 'wrapper=', '&')) || '').replaceAll('+', ' ').replaceAll('%20', ' ').trim().replace('[href]', href) + '|';
+  const splitWrapper = wrapper.split('|');
+  const lhsWrapper = splitWrapper[0];
+  const rhsWrapper = splitWrapper[1];
   const tween = substrBetween(text, lhs, rhs);
-  return new Response(`
-  <!DOCTYPE html>
-  ${lhsWrapper}${lhs}${tween}${rhs}${rhsWrapper}
-  `, {headers});
+  const respText = `${lhsWrapper}${lhs}${tween}${rhs}${rhsWrapper}`;
+  return new Response(respText, {headers});
 }
