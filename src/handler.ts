@@ -30,14 +30,12 @@ export async function handleRequest(request: Request): Promise<Response> {
       <form style="display:flex;flex-direction:column">
         <label for="href">href</label>
         <input type="text" name="href" value="https://onsen.io/">
-        <label for="lhs">lhs</label>
-        <input type="text" name="lhs" value="<head">
-        <label for="rhs">rhs</label>
-        <input type="text" name="rhs" value="</head>">
+        <label for="between">between</label>
+        <textarea name="between"><head></head></textarea>
         <label for="ts">Timestamp</label>
         <input type="text" id="ts" name="ts" value="${new Date().toISOString()}">
         <label for="wrapper">wrapper</label>
-        <textarea type="text" name="wrapper"><template><header href="[href]">|</header></template></textarea>
+        <textarea name="wrapper"><template><header href="[href]">|</header></template></textarea>
         <label for="ua">User-Agent</label>
         <input type="text" name="ua" value="">
         <button type="submit">Submit</button>
@@ -56,8 +54,10 @@ export async function handleRequest(request: Request): Promise<Response> {
   });
 
   const text = await response.text();
-  const lhs = unescape(substrBetween(url, 'lhs=', '&')) || '<html';
-  const rhs = unescape(substrBetween(url, 'rhs=', '&')) || '</html>';
+  const between = unescape(substrBetween(url, 'between=', '&')) || '<html></html>';
+  const iPosOfClosedAngleBracket = between.indexOf('>');
+  const lhs = between.substring(0, iPosOfClosedAngleBracket);
+  const rhs = between.substring(iPosOfClosedAngleBracket + 1);
   const wrapper = (unescape(substrBetween(url, 'wrapper=', '&')) || '').replaceAll('+', ' ').replaceAll('%20', ' ').trim().replace('[href]', href) + '|';
   const splitWrapper = wrapper.split('|');
   const lhsWrapper = splitWrapper[0];
