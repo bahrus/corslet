@@ -62,7 +62,10 @@ export async function handleRequest(request: Request): Promise<Response> {
   const splitWrapper = wrapper.split('|');
   const lhsWrapper = splitWrapper[0];
   const rhsWrapper = splitWrapper[1];
-  const tween = substrBetween(text, lhs, rhs);
+  let tween = substrBetween(text, lhs, rhs);
+  if(tween === '') {
+    tween = '>' + text;
+  }
   const respText = `${lhsWrapper}${lhs}${tween}${rhs}${rhsWrapper}`;
   return new Response(respText, {headers});
 }
