@@ -47,13 +47,17 @@ export async function handleRequest(request: Request): Promise<Response> {
   const ts = unescape(substrBetween(url, 'ts=', '&')) || new Date().toISOString();
   //TODO:  check for cache
   const ua = unescape(substrBetween(url, 'ua=', '&')) || request.headers.get('user-agent') || "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1 Edg/96.0.4664.55";
+  console.log(ua);
   const response = await fetch(href, {
     headers: {
       "User-Agent": ua,
+      "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+
     }
   });
 
   const text = await response.text();
+  console.log(text);
   const between = unescape(substrBetween(url, 'between=', '&')) || '<html></html>';
   const iPosOfClosedAngleBracket = between.indexOf('>');
   const lhs = between.substring(0, iPosOfClosedAngleBracket);
