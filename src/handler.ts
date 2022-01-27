@@ -18,7 +18,7 @@ export async function handleRequest(request: Request): Promise<Response> {
       <meta http-equiv="X-UA-Compatible" content="IE=edge">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta name="ts" content="${new Date().toISOString()}">
-      <title>PWARP Usage</title>
+      <title>Corslet Usage</title>
       <!-- Compiled and minified CSS -->
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 
@@ -57,15 +57,17 @@ export async function handleRequest(request: Request): Promise<Response> {
   });
 
   const text = await response.text();
-  console.log(text);
   const between = unescape(substrBetween(url, 'between=', '&')) || '<html></html>';
   const iPosOfClosedAngleBracket = between.indexOf('>');
-  const lhs = between.substring(0, iPosOfClosedAngleBracket);
-  const rhs = between.substring(iPosOfClosedAngleBracket + 1);
+  const lhs = unescape(between.substring(0, iPosOfClosedAngleBracket)).replaceAll('+', ' ');
+  const rhs = unescape(between.substring(iPosOfClosedAngleBracket + 1)).replaceAll('+', ' ');
+  console.log('lhs', lhs);
+  console.log('rhs', rhs);
   const wrapper = (unescape(substrBetween(url, 'wrapper=', '&')) || '').replaceAll('+', ' ').replaceAll('%20', ' ').trim().replace('[href]', href) + '|';
   const splitWrapper = wrapper.split('|');
   const lhsWrapper = splitWrapper[0];
   const rhsWrapper = splitWrapper[1];
+  console.log('pos of lhs', text.indexOf(lhs));
   let tween = substrBetween(text, lhs, rhs);
   if(tween === '') {
     tween = '>' + text;
