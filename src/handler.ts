@@ -29,9 +29,15 @@ export async function handleRequest(request: Request): Promise<Response> {
       <h1>Corslet Usage</h1>
       <form style="display:flex;flex-direction:column">
         <label for="href">href</label>
-        <input type="text" name="href" value="https://onsen.io/">
-        <label for="between">between</label>
-        <textarea name="between"><head></head></textarea>
+        <input type="text" name="href" value="https://www.supremecourt.gov/about/members_text.aspx">
+        <label for="lhs">LHS</label>
+        <textarea name="lhs"><div id="pagemaindiv" class="col-md-9"></textarea>
+        <label for="rhs">RHS</label>
+        <textarea name="rhs">script</textarea>
+        <label for="exclude_lhs">Exclude LHS</label>
+        <input type=checkbox name="exclude_lhs">
+        <label for="exclude_rhs">Exclude RHS</label>
+        <input type=checkbox checked name="exclude_rhs">
         <label for="ts">Timestamp</label>
         <input type="text" id="ts" name="ts" value="${new Date().toISOString()}">
         <label for="wrapper">wrapper</label>
@@ -57,18 +63,25 @@ export async function handleRequest(request: Request): Promise<Response> {
   });
 
   const text = await response.text();
-  const between = unescape(substrBetween(url, 'between=', '&')) || '<html></html>';
-  const iPosOfClosedAngleBracket = between.indexOf('>');
-  const lhs = unescape(between.substring(0, iPosOfClosedAngleBracket)).replaceAll('+', ' ');
-  const rhs = unescape(between.substring(iPosOfClosedAngleBracket + 1)).replaceAll('+', ' ');
+  //const between = unescape(substrBetween(url, 'between=', '&')) || '<html></html>';
+  const lhs = unescape(substrBetween(url, 'lhs=', '&')).replaceAll('+', ' ') || '<html';
+  const rhs = unescape(substrBetween(url, 'rhs=', '&')).replaceAll('+', ' ') || '</html>';
+  // const iPosOfClosedAngleBracket = between.indexOf('>');
+  // const lhs = unescape(between.substring(0, iPosOfClosedAngleBracket)).replaceAll('+', ' ');
+  // const rhs = unescape(between.substring(iPosOfClosedAngleBracket + 1)).replaceAll('+', ' ');
   console.log('lhs', lhs);
   console.log('rhs', rhs);
+
   const wrapper = (unescape(substrBetween(url, 'wrapper=', '&')) || '').replaceAll('+', ' ').replaceAll('%20', ' ').trim().replace('[href]', href) + '|';
   const splitWrapper = wrapper.split('|');
   const lhsWrapper = splitWrapper[0];
   const rhsWrapper = splitWrapper[1];
   console.log('pos of lhs', text.indexOf(lhs));
   let tween = substrBetween(text, lhs, rhs);
+  const exclude_lhs = substrBetween(url, 'exclude_lhs=', '&') === 'true';
+  const exclude_rhs = substrBetween(url, 'exclude_rhs=', '&') === 'true';
+  console.log('exclude_lhs', exclude_lhs);
+  console.log('exclude_rhs', exclude_rhs);
   if(tween === '') {
     tween = '>' + text;
   }
