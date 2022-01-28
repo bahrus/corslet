@@ -19,11 +19,8 @@ export async function handleRequest(request: Request): Promise<Response> {
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta name="ts" content="${new Date().toISOString()}">
       <title>Corslet Usage</title>
-      <!-- Compiled and minified CSS -->
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 
-      <!-- Compiled and minified JavaScript -->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+      <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
     </head>
     <body>
       <h1>Corslet Usage</h1>
@@ -36,7 +33,9 @@ export async function handleRequest(request: Request): Promise<Response> {
         <textarea name="rhs">script</textarea>
         <label for="exclude_lhs">Exclude LHS</label>
         <input type=checkbox name="exclude_lhs">
-        <label for="exclude_rhs">Exclude RHS</label>
+        <label for="exclude_rhs">
+          Exclude RHS
+        </label>
         <input type=checkbox checked name="exclude_rhs">
         <label for="ts">Timestamp</label>
         <input type="text" id="ts" name="ts" value="${new Date().toISOString()}">
