@@ -40,7 +40,7 @@ export async function handleRequest(request: Request): Promise<Response> {
         <label for="ts">Timestamp</label>
         <input type="text" id="ts" name="ts" value="${new Date().toISOString()}">
         <label for="wrapper">wrapper</label>
-        <textarea name="wrapper"><template><header href="[href]">|</header></template></textarea>
+        <textarea name="wrapper"><div>|</div></textarea>
         <label for="ua">User-Agent</label>
         <input type="text" name="ua" value="">
         <button type="submit">Submit</button>
@@ -77,13 +77,14 @@ export async function handleRequest(request: Request): Promise<Response> {
   const rhsWrapper = splitWrapper[1];
   console.log('pos of lhs', text.indexOf(lhs));
   let tween = substrBetween(text, lhs, rhs);
-  const exclude_lhs = substrBetween(url, 'exclude_lhs=', '&') === 'true';
-  const exclude_rhs = substrBetween(url, 'exclude_rhs=', '&') === 'true';
+  const exclude_lhs = substrBetween(url, 'exclude_lhs=', '&') === 'on';
+  const exclude_rhs = substrBetween(url, 'exclude_rhs=', '&') === 'on';
   console.log('exclude_lhs', exclude_lhs);
   console.log('exclude_rhs', exclude_rhs);
   if(tween === '') {
     tween = '>' + text;
   }
-  const respText = `${lhsWrapper}${lhs}${tween}${rhs}${rhsWrapper}`;
+  const conditionalRHS = exclude_rhs ? '' : rhs;
+  const respText = `${lhsWrapper}${lhs}${tween}${conditionalRHS}${rhsWrapper}`;
   return new Response(respText, {headers});
 }
